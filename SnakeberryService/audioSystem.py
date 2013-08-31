@@ -6,9 +6,11 @@
 import tornado.web, subprocess
 from snakeberryJSON import *
 from common import *
+from configMgr import *
 
 #Webservice requesthandler to set system volume on raspberry pi as root
-#Author: Bruno Hautzenberger  
+#Author: Bruno Hautzenberger
+#Edited: kodejak <mail at kodejak dot de>
 class SetVolume(tornado.web.RequestHandler):
     def get(self,volume):
         rObject = None
@@ -18,6 +20,9 @@ class SetVolume(tornado.web.RequestHandler):
         try:
             subprocess.call(['sudo', 'amixer', 'set', 'PCM', '--', volume]) #ROOT CALL
             #subprocess.call(['amixer', 'cset', 'numid=3', '--', volume]) #USER CALL
+            
+            # remember current volume
+            MyConfig().SetVar('Common', 'LastVolume', volume)
         except Exception, err:
             errMsg = str(err)
             errNum = errNumSetVolumeFailed
