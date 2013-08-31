@@ -4,15 +4,19 @@
 ## and the Beerware (http://en.wikipedia.org/wiki/Beerware) license.
 
 import tornado.ioloop
-import tornado.web
+import tornado.web, csv
+import logging
 from snakeberryJSON import *
 from radio import *
 from audioSystem import *
 from services import *
+from mplayerInterface import *
+from configMgr import *
 
 #Main loop
 #Generates all service endpoints
 #Author: Bruno Hautzenberger
+#Edited: kodejak <mail at kodejak dot de>
 if __name__ == "__main__":
     application = tornado.web.Application([
         (r"/", ListServices),
@@ -24,7 +28,31 @@ if __name__ == "__main__":
         (r"/setvolume/(.*)", SetVolume),
         (r"/getmac", GetMac),
     ])
-    application.listen(8888) #Todo load port from a config file or so
+    
+    application.listen(8888)
+
+    # Resume playing if needed and possible
+    mplayer = None
+    lastStationDesc = MyConfig().GetVar('LastStream', 'Description')
+    lastStationUrl = MyConfig().GetVar('LastStream', 'Url')
+    mustResume = MyConfig().GetVar('LastStream', 'MustResume')
+    forceResume = MyConfig().GetVar('LastStream', 'ForceResume')
+
+    if lastStationDesc != None and lastStationUrl != None and \
+      (mustResume == 'true' or forceResume == 'true'):
+        mplayer = MplayerProcess("Radio", lastStationDesc, lastStationUrl)   	
+
+    if mplayer != None:
+        Mplayer.play(mplayer)
+        
+    # Restore last volume
+    lastVolume = MyConfig().GetVar('Common', 'LastVolume')
+    try:
+        if (lastVolume != None):
+            subprocess.call(['sudo', 'amixer', 'set', 'PCM', '--', lastVolume]) #ROOT CALL
+    except Exception, e:
+        logging.exception(e)
+
     tornado.ioloop.IOLoop.instance().start()
 
 
