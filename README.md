@@ -1,5 +1,5 @@
-snakeberry modifications
-========================
+snakeberry
+==========
 
 Snakeberry is a lightweight media server for Raspberry Pi written in Python. It can be controlled by an Android app. At the moment Snakeberry can play radio streams using mplayer.
 
