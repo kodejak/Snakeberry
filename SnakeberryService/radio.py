@@ -7,6 +7,7 @@ import tornado.web, csv
 from snakeberryJSON import *
 from common import *
 from mplayerInterface import *
+from configMgr import *
 
 #Representing a radio station
 #Author: Bruno Hautzenberger
@@ -50,7 +51,8 @@ class ListRadios(tornado.web.RequestHandler):
         self.write(SnakeberryJSON().encode(Response(errNum, errMsg, rObject)))
 
 #Webservice requesthandler to play radio station with given id
-#Author: Bruno Hautzenberger         
+#Author: Bruno Hautzenberger
+#Edited: kodejak <mail at kodejak dot de>
 class PlayRadio(tornado.web.RequestHandler):
     def get(self, radioId):
         rObject = None
@@ -72,6 +74,10 @@ class PlayRadio(tornado.web.RequestHandler):
             else:
                 mplayer = MplayerProcess("Radio", description, streamUrl)
                 Mplayer.play(mplayer)
+                # remember radio station properties
+                MyConfig().SetVar('LastStream', 'Description', description)
+                MyConfig().SetVar('LastStream', 'Url', streamUrl)
+                MyConfig().SetVar('LastStream', 'MustResume', 'true')
         except Exception, err:
             errMsg = str(err)
             errNum = errNumPlayRadioStationFailed
@@ -79,7 +85,8 @@ class PlayRadio(tornado.web.RequestHandler):
         self.write(SnakeberryJSON().encode(Response(errNum, errMsg, rObject)))
 
 #Webservice requesthandler to stop radio
-#Author: Bruno Hautzenberger              
+#Author: Bruno Hautzenberger
+#Edited: kodejak <mail at kodejak dot de>
 class StopRadio(tornado.web.RequestHandler):
     def get(self):
         rObject = None
@@ -88,6 +95,8 @@ class StopRadio(tornado.web.RequestHandler):
         
         try:
             Mplayer.stop()
+            # remember that the radio station was stopped
+            MyConfig().SetVar('LastStream', 'MustResume', 'false')
         except Exception, err:
             errMsg = str(err)
             errNum = errNumStopRadioStationFailed
@@ -95,7 +104,7 @@ class StopRadio(tornado.web.RequestHandler):
         self.write(SnakeberryJSON().encode(Response(errNum, errMsg, rObject)))
 
 #Webservice requesthandler to recieve what information about what the radio is playing
-#Author: Bruno Hautzenberger          
+#Author: Bruno Hautzenberger         
 class RadioNowPlaying(tornado.web.RequestHandler):
     def get(self):
         rObject = None
