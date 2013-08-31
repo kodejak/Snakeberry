@@ -7,8 +7,7 @@ Snakeberry founder page: http://github.com/salendron/Snakeberry
 
 This modification can save the last radio station to a config file and resume playing after a service / device restart. Saving and restoring the last mixer volume is possible too.
 
-At first you must download the Python project and Android app from salendron's repository to tune in. There you can find installing instructions too. After that, update and add the files from this repository.
-
+On the founders project page wiki you can find installing instructions. For snakeberry intalling to the raspberry pi using the "snakeberryService" from this repository.
 
 Additional files are:
 * configMgr.py - a simple config file manager
