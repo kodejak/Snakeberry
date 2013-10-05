@@ -2,6 +2,8 @@
 ## This file is part of Snakeberry by Bruno Hautzenberger (http://the-engine.at)
 ## Dual-licensed under the MIT (http://www.opensource.org/licenses/mit-license.php)
 ## and the Beerware (http://en.wikipedia.org/wiki/Beerware) license.
+##
+## JSONP Support by: mail at kodejak dot de
 
 import tornado.web, csv
 from snakeberryJSON import *
@@ -40,6 +42,7 @@ class ListRadios(tornado.web.RequestHandler):
         rObject = None
         errNum = errNumOk
         errMsg = errMsgOk
+        callbackFunc = self.get_argument('callback', None)
         
         try:
             radios = Radios()
@@ -48,7 +51,11 @@ class ListRadios(tornado.web.RequestHandler):
             errMsg = str(err)
             errNum = errNumListRadioStationsFailed
             
-        self.write(SnakeberryJSON().encode(Response(errNum, errMsg, rObject)))
+        if callbackFunc == None:
+            self.write(SnakeberryJSON().encode(Response(errNum, errMsg, rObject)))
+        else:
+            self.write(callbackFunc +'('+ SnakeberryJSON().encode(Response(errNum, errMsg, rObject)) +')')
+
 
 #Webservice requesthandler to play radio station with given id
 #Author: Bruno Hautzenberger
@@ -58,6 +65,7 @@ class PlayRadio(tornado.web.RequestHandler):
         rObject = None
         errNum = errNumOk
         errMsg = errMsgOk
+        callbackFunc = self.get_argument('callback', None)
         
         try:
             streamUrl = None
@@ -82,7 +90,10 @@ class PlayRadio(tornado.web.RequestHandler):
             errMsg = str(err)
             errNum = errNumPlayRadioStationFailed
             
-        self.write(SnakeberryJSON().encode(Response(errNum, errMsg, rObject)))
+        if callbackFunc == None:
+            self.write(SnakeberryJSON().encode(Response(errNum, errMsg, rObject)))
+        else:
+            self.write(callbackFunc +'('+ SnakeberryJSON().encode(Response(errNum, errMsg, rObject)) +')')
 
 #Webservice requesthandler to stop radio
 #Author: Bruno Hautzenberger
@@ -92,6 +103,7 @@ class StopRadio(tornado.web.RequestHandler):
         rObject = None
         errNum = errNumOk
         errMsg = errMsgOk
+        callbackFunc = self.get_argument('callback', None)
         
         try:
             Mplayer.stop()
@@ -101,7 +113,10 @@ class StopRadio(tornado.web.RequestHandler):
             errMsg = str(err)
             errNum = errNumStopRadioStationFailed
             
-        self.write(SnakeberryJSON().encode(Response(errNum, errMsg, rObject)))
+        if callbackFunc == None:
+            self.write(SnakeberryJSON().encode(Response(errNum, errMsg, rObject)))
+        else:
+            self.write(callbackFunc +'('+ SnakeberryJSON().encode(Response(errNum, errMsg, rObject)) +')')
 
 #Webservice requesthandler to recieve what information about what the radio is playing
 #Author: Bruno Hautzenberger         
@@ -110,6 +125,7 @@ class RadioNowPlaying(tornado.web.RequestHandler):
         rObject = None
         errNum = errNumOk
         errMsg = errMsgOk
+        callbackFunc = self.get_argument('callback', None)
         
         try:
             rObject = Mplayer.currentProcess
@@ -119,4 +135,7 @@ class RadioNowPlaying(tornado.web.RequestHandler):
             errMsg = str(err)
             errNum = errNumStopRadioStationFailed
             
-        self.write(SnakeberryJSON().encode(Response(errNum, errMsg, rObject)))
+        if callbackFunc == None:
+            self.write(SnakeberryJSON().encode(Response(errNum, errMsg, rObject)))
+        else:
+            self.write(callbackFunc +'('+ SnakeberryJSON().encode(Response(errNum, errMsg, rObject)) +')')
