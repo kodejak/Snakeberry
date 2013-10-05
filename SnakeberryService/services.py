@@ -2,6 +2,8 @@
 ## This file is part of Snakeberry by Bruno Hautzenberger (http://the-engine.at)
 ## Dual-licensed under the MIT (http://www.opensource.org/licenses/mit-license.php)
 ## and the Beerware (http://en.wikipedia.org/wiki/Beerware) license.
+##
+## JSONP Support by: mail at kodejak dot de
 
 import tornado.web
 from uuid import getnode as get_mac
@@ -32,6 +34,7 @@ class ListServices(tornado.web.RequestHandler):
         rObject = None
         errNum = errNumOk
         errMsg = errMsgOk
+        callbackFunc = self.get_argument('callback', None)
         
         try:
             services = Services()
@@ -40,7 +43,10 @@ class ListServices(tornado.web.RequestHandler):
             errMsg = str(err)
             errNum = errNumListServicesFailed
             
-        self.write(SnakeberryJSON().encode(Response(errNum, errMsg, rObject)))
+        if callbackFunc == None:
+            self.write(SnakeberryJSON().encode(Response(errNum, errMsg, rObject)))
+        else:
+            self.write(callbackFunc +'('+ SnakeberryJSON().encode(Response(errNum, errMsg, rObject)) +')')
         
 #Returns the Snakeberries Mac Adress
 #Author: Bruno Hautzenberger
@@ -49,6 +55,7 @@ class GetMac(tornado.web.RequestHandler):
         rObject = None
         errNum = errNumOk
         errMsg = errMsgOk
+        callbackFunc = self.get_argument('callback', None)
         
         try:
             rObject = get_mac()
@@ -56,4 +63,7 @@ class GetMac(tornado.web.RequestHandler):
             errMsg = str(err)
             errNum = errNumGetMacFailed
             
-        self.write(SnakeberryJSON().encode(Response(errNum, errMsg, rObject)))
+        if callbackFunc == None:
+            self.write(SnakeberryJSON().encode(Response(errNum, errMsg, rObject)))
+        else:
+            self.write(callbackFunc +'('+ SnakeberryJSON().encode(Response(errNum, errMsg, rObject)) +')')
