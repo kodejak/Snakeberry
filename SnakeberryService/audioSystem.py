@@ -2,6 +2,8 @@
 ## This file is part of Snakeberry by Bruno Hautzenberger (http://the-engine.at)
 ## Dual-licensed under the MIT (http://www.opensource.org/licenses/mit-license.php)
 ## and the Beerware (http://en.wikipedia.org/wiki/Beerware) license.
+##
+## JSONP Support by: mail at kodejak dot de
 
 import tornado.web, subprocess
 from snakeberryJSON import *
@@ -16,6 +18,7 @@ class SetVolume(tornado.web.RequestHandler):
         rObject = None
         errNum = errNumOk
         errMsg = errMsgOk
+        callbackFunc = self.get_argument('callback', None)
         
         try:
             subprocess.call(['sudo', 'amixer', 'set', 'PCM', '--', volume]) #ROOT CALL
@@ -27,7 +30,11 @@ class SetVolume(tornado.web.RequestHandler):
             errMsg = str(err)
             errNum = errNumSetVolumeFailed
             
-        self.write(SnakeberryJSON().encode(Response(errNum, errMsg, rObject)))
+        if callbackFunc == None:
+            self.write(SnakeberryJSON().encode(Response(errNum, errMsg, rObject)))
+        else:
+            self.write(callbackFunc +'('+ SnakeberryJSON().encode(Response(errNum, errMsg, rObject)) +')')
+
 
 #Webservice requesthandler to retrieve system volume from raspberry pi as root
 #Author: Bruno Hautzenberger   
@@ -36,6 +43,7 @@ class GetVolume(tornado.web.RequestHandler):
         rObject = None
         errNum = errNumOk
         errMsg = errMsgOk
+        callbackFunc = self.get_argument('callback', None)
         
         try:
             p = subprocess.Popen(['sudo', 'amixer'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -55,4 +63,7 @@ class GetVolume(tornado.web.RequestHandler):
             errMsg = str(err)
             errNum = errNumGetVolumeFailed
             
-        self.write(SnakeberryJSON().encode(Response(errNum, errMsg, rObject)))
+        if callbackFunc == None:
+            self.write(SnakeberryJSON().encode(Response(errNum, errMsg, rObject)))
+        else:
+            self.write(callbackFunc +'('+ SnakeberryJSON().encode(Response(errNum, errMsg, rObject)) +')')
