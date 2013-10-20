@@ -4,6 +4,7 @@
 ## and the Beerware (http://en.wikipedia.org/wiki/Beerware) license.
 
 import subprocess, signal, os
+from configMgr import *
 
 #Representing a running mplayer process
 #Author: Bruno Hautzenberger
@@ -19,6 +20,8 @@ class MplayerProcess():
 class Mplayer():
     #the current running mplayer process - none if no mplayer process is running
     currentProcess = None
+
+    cacheSize = MyConfig().GetVar('Common', 'CacheSize')
     
     #starts mplayer with a given media URI
     #stops the running mplayer process
@@ -27,7 +30,7 @@ class Mplayer():
     def play(process):
         Mplayer.stop()
         Mplayer.currentProcess = process
-        pipe = subprocess.Popen(['mplayer',Mplayer.currentProcess.MediaURI])
+        pipe = subprocess.Popen(['mplayer','-cache', Mplayer.cacheSize, Mplayer.currentProcess.MediaURI])
         Mplayer.currentProcess.PID = pipe.pid
     
     #stops mplayer
