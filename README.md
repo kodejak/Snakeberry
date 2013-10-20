@@ -21,7 +21,9 @@ Entries for snakeberry.cfg are following (in the "LastStream" section)
 
 The first three entries are auto updated. "MustResume" is updating if the radio station is playing or was stopped. Stopped streams would not be resumed after a restart. The manually setting of "ForceResume" to "true" cause to well-defined resuming of the last radio station.
 
-In the "Common" section will be stored the current mixer volume as an entry named "LastVolume".
+In the "Common" section :
+- "LastVolume" - the current mixer volume
+- "CacheSize" - the cache size in kB
 
 
-Snakberry is dual-licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) and the Beerware (http://en.wikipedia.org/wiki/Beerware) license.
+Snakeberry is dual-licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) and the Beerware (http://en.wikipedia.org/wiki/Beerware) license.
