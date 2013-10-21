@@ -28,6 +28,7 @@ class MyConfig():
             config.set('LastStream', 'ForceResume', 'false')
             # last volume
             config.set('Common', 'LastVolume', '')
+            config.set('Common', 'CacheSize', '512')
             with open(self.filename, 'w+') as configfile:
                 config.write(configfile)
         except Exception, e:
